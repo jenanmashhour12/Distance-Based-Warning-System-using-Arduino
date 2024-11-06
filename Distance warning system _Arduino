@@ -1,0 +1,71 @@
+int trig = 11;                //trigger of the ultrasonic sensor
+int echo = 10;                // echo of the ultrasonic sensor
+int red = 5;                  
+int yellow = 6;               
+int green = 7;                
+
+long duration = 0;            
+int cm = 0;                // calculated distance var in centimeters
+int greenThreshold = 20;      
+int yellowThreshold = 10;     
+int maxRange = 100;   
+
+void setup() {
+    pinMode(trig, OUTPUT);    //trigger pin as output
+    pinMode(echo, INPUT);     //echo pin as input
+    pinMode(red, OUTPUT);     //red led pin as output
+    pinMode(green, OUTPUT);   //green led pin as output
+    
+    Serial.begin(9600);       //starting the serial communication @ 9600 
+
+    Serial.println("Serial is Starting>>>"); // printing message to indicate that serial is ready
+}
+
+void loop() {
+  
+    //sending a pulse from the ultrasonic sensor
+
+    digitalWrite(trig, LOW);         // set trigger to low
+    delayMicroseconds(5);            // waiting 5 microseconds
+    digitalWrite(trig, HIGH);        //initiating a pulse
+    delayMicroseconds(10);           // waiting 10 microseconds
+
+    digitalWrite(trig, LOW);   
+      
+   
+    duration = pulseIn(echo, HIGH);  // read the duration of the high signal .
+    cm = duration * 0.034 / 2;       // converting the duration into distance in cm.
+
+ 
+    Serial.print("Distance: ");
+    Serial.print(cm);
+    Serial.println(" cm");
+
+    //LED-control based on specific distance
+
+    if (cm > maxRange) {
+
+        //if the distance exceeds maxRange turn off the LEDs
+
+        digitalWrite(red, LOW);
+        digitalWrite(yellow, LOW);
+        digitalWrite(green, LOW);
+    } else {
+        //turn on specific LEDs based on the distance ranges:
+        if (cm <= yellowThreshold) {
+            digitalWrite(red, HIGH);    // red LED on 
+            digitalWrite(yellow, LOW);
+            digitalWrite(green, LOW);
+        } else if (cm <= greenThreshold) {
+            digitalWrite(red, LOW);
+            digitalWrite(yellow, HIGH); // yellow LED on 
+            digitalWrite(green, LOW);
+        } else {
+            digitalWrite(red, LOW);
+            digitalWrite(yellow, LOW);
+            digitalWrite(green, HIGH);  // green LED on 
+        }
+    }
+    
+    delay(100); // delay for stability
+}
